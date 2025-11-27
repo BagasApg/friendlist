@@ -43,19 +43,33 @@ int max(int left, int right)
     return right;
 }
 
-Node * leftRotate(Node * node){
-    Node * temp;
+Node *leftRotate(Node *node)
+{
+    Node *y = node->right;
+    Node *t2 = y->left;
 
-    temp = node->right;
-    node->right = nullptr;
-    
-    temp->left = node;
-    node = temp;
+    y->left = node;
+    node->right = t2;
 
-    return node;
+    node->height = 1 + max(height(node->left), height(node->right));
+    y->height = 1 + max(height(y->left), height(y->right));
+
+    return y;
 }
 
+Node *rightRotate(Node *node)
+{
+    Node *y = node->left;
+    Node *t2 = y->right;
 
+    y->right = node;
+    node->left = t2;
+
+    node->height = 1 + max(height(node->left), height(node->right));
+    y->height = 1 + max(height(y->left), height(y->right));
+
+    return y;
+}
 
 Node *insertNode(Node *root, int id, int level, std::string username, std::string rank)
 {
@@ -64,7 +78,7 @@ Node *insertNode(Node *root, int id, int level, std::string username, std::strin
         root = createNewNode(id, level, username, rank);
     }
 
-    else if (id <= root->id)
+    else if (id < root->id)
     {
         root->left = insertNode(root->left, id, level, username, rank);
     }
@@ -79,10 +93,25 @@ Node *insertNode(Node *root, int id, int level, std::string username, std::strin
     std::cout << bf << std::endl;
     std::cout << root->height << "-" << root->username << std::endl;
 
-    if (bf < -1){
+    if (bf < -1 && id > root->right->id)
+    {
         return leftRotate(root);
     }
-    
+    else if (bf > 1 && id < root->left->id)
+    {
+        return rightRotate(root);
+    }
+    else if (bf < -1 && id < root->right->id)
+    {
+        root->right = rightRotate(root->right);
+        return leftRotate(root);
+    }
+    else if (bf > 1 && id > root->left->id)
+    {
+        root->left = leftRotate(root->left);
+        return rightRotate(root);
+    }
+
     return root;
 }
 
@@ -153,6 +182,7 @@ void show(Node *root, int step = 0)
 
     show(root->left, ++step);
 
+    std::cout << height(root->left) - height(root->right) << " = ";
     std::cout << root->height << "\t";
     std::cout << root->id << "\t";
     std::cout << root->level << "\t";
@@ -167,16 +197,16 @@ main()
 
     Node *root = nullptr;
 
-    root = insertNode(root, 1, 33, "suichan", "3-1");
-    std::cout << std::endl;
-    root = insertNode(root, 3, 33, "Vretz", "3-1");
-    std::cout << std::endl;
-    root = insertNode(root, 5, 33, "bunnyhop", "3-1");
-    std::cout << std::endl;
-
+    root = insertNode(root, 3, 33, "Vretz", "5-1");
+    root = insertNode(root, 8, 33, "Bunnyhop", "5-1");
+    root = insertNode(root, 5, 33, "Bunnyhop senpai", "5-1");
+    root = insertNode(root, 10, 33, "suichan", "5-1");
+    root = insertNode(root, 1, 33, "newbie", "5-1");
     show(root);
 
-    std::cout << std::endl
-              << "Done!";
+    // show(root);
+
+    std::cout << "Done!";
+
     return 0;
 }
