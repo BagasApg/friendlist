@@ -43,6 +43,20 @@ int max(int left, int right)
     return right;
 }
 
+Node * leftRotate(Node * node){
+    Node * temp;
+
+    temp = node->right;
+    node->right = nullptr;
+    
+    temp->left = node;
+    node = temp;
+
+    return node;
+}
+
+
+
 Node *insertNode(Node *root, int id, int level, std::string username, std::string rank)
 {
     if (root == nullptr)
@@ -60,8 +74,15 @@ Node *insertNode(Node *root, int id, int level, std::string username, std::strin
     }
 
     root->height = 1 + max(height(root->left), height(root->right));
+
+    int bf = height(root->left) - height(root->right);
+    std::cout << bf << std::endl;
     std::cout << root->height << "-" << root->username << std::endl;
 
+    if (bf < -1){
+        return leftRotate(root);
+    }
+    
     return root;
 }
 
@@ -150,7 +171,7 @@ main()
     std::cout << std::endl;
     root = insertNode(root, 3, 33, "Vretz", "3-1");
     std::cout << std::endl;
-    root = insertNode(root, 2, 33, "bunnyhop", "3-1");
+    root = insertNode(root, 5, 33, "bunnyhop", "3-1");
     std::cout << std::endl;
 
     show(root);
