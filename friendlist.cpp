@@ -43,6 +43,15 @@ int max(int left, int right)
     return right;
 }
 
+Node *getMin(Node *node)
+{
+    while (node->left != nullptr)
+    {
+        node = node->left;
+    }
+    return node;
+}
+
 Node *leftRotate(Node *node)
 {
     Node *y = node->right;
@@ -69,6 +78,11 @@ Node *rightRotate(Node *node)
     y->height = 1 + max(height(y->left), height(y->right));
 
     return y;
+}
+
+int balanceFactor(Node *node)
+{
+    return height(node->left) - height(node->right);
 }
 
 Node *insertNode(Node *root, int id, int level, std::string username, std::string rank)
@@ -107,6 +121,77 @@ Node *insertNode(Node *root, int id, int level, std::string username, std::strin
         return leftRotate(root);
     }
     else if (bf > 1 && id > root->left->id)
+    {
+        root->left = leftRotate(root->left);
+        return rightRotate(root);
+    }
+
+    return root;
+}
+
+Node *deleteNode(Node *root, int id)
+{
+    if (root == nullptr)
+    {
+        return root;
+    }
+    else if (id < root->id)
+    {
+        root->left = deleteNode(root->left, id);
+    }
+    else if (id > root->id)
+    {
+        root->right = deleteNode(root->right, id);
+    }
+    else
+    {
+        if (root->left == nullptr)
+        {
+            Node *temp = root->right;
+
+            delete root;
+
+            return temp;
+        }
+        else if (root->right == nullptr)
+        {
+            Node *temp = root->left;
+
+            delete root;
+
+            return temp;
+        }
+        else
+        {
+            Node *temp = getMin(root->right);
+
+            root->id = temp->id;
+            root->level = temp->id;
+            root->username = temp->username;
+            root->rank = temp->rank;
+
+            root->right = deleteNode(root->right, temp->id);
+        }
+    }
+
+    root->height = 1 + max(height(root->left), height(root->right));
+
+    int bf = height(root->left) - height(root->right);
+
+    if (bf < -1 && balanceFactor(root->right) < 0)
+    {
+        return leftRotate(root);
+    }
+    else if (bf > 1 && balanceFactor(root->left) > 0)
+    {
+        return rightRotate(root);
+    }
+    else if (bf < -1 && balanceFactor(root->right) > 0)
+    {
+        root->right = rightRotate(root->right);
+        return leftRotate(root);
+    }
+    else if (bf > 1 && balanceFactor(root->left) < 0)
     {
         root->left = leftRotate(root->left);
         return rightRotate(root);
@@ -200,13 +285,18 @@ main()
     root = insertNode(root, 3, 33, "Vretz", "5-1");
     root = insertNode(root, 8, 33, "Bunnyhop", "5-1");
     root = insertNode(root, 5, 33, "Bunnyhop senpai", "5-1");
-    root = insertNode(root, 10, 33, "suichan", "5-1");
+    root = insertNode(root, 10, 33, "suichan", "8-1");
     root = insertNode(root, 1, 33, "newbie", "5-1");
+    root = insertNode(root, 11, 33, "impii", "9-1");
+    root = insertNode(root, 200, 33, "newbie", "5-1");
     show(root);
 
-    // show(root);
+    std::cout << std::endl;
+    root = deleteNode(root, 10);
+    root = deleteNode(root, 11);
+    show(root);
 
-    std::cout << "Done!";
+    std::cout << "Done!~";
 
     return 0;
 }
