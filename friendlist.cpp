@@ -34,6 +34,13 @@ int height(Node *node)
     return node->height;
 }
 
+Node *findMin(Node *node) {
+    if (node->left != nullptr) {
+        node = node->left;
+    }
+    return node;
+}
+
 int max(int left, int right)
 {
     if (left > right)
@@ -71,6 +78,31 @@ Node *rightRotate(Node *node)
     return y;
 }
 
+Node *reBalance(Node *root,int id) {
+    root->height = 1 + max(height(root->left), height(root->right));
+
+    int bf = height(root->left) - height(root->right);
+    std::cout << bf << std::endl;
+    std::cout << root->height << "-" << root->username << std::endl;
+
+    if (bf < -1 )
+    {
+        if (id < root->right->id) {
+            root->right = rightRotate(root->right);
+        }
+        return leftRotate(root);
+    }
+    else if (bf > 1 )
+    {
+        if (id > root->right->id) {
+            root->left = leftRotate(root->left);
+        }
+        return rightRotate(root);
+    }
+
+    return root;
+}
+
 Node *insertNode(Node *root, int id, int level, std::string username, std::string rank)
 {
     if (root == nullptr)
@@ -86,33 +118,32 @@ Node *insertNode(Node *root, int id, int level, std::string username, std::strin
     {
         root->right = insertNode(root->right, id, level, username, rank);
     }
+    return reBalance(root, id);
+}
 
-    root->height = 1 + max(height(root->left), height(root->right));
-
-    int bf = height(root->left) - height(root->right);
-    std::cout << bf << std::endl;
-    std::cout << root->height << "-" << root->username << std::endl;
-
-    if (bf < -1 && id > root->right->id)
-    {
-        return leftRotate(root);
+Node *deleteNode(Node *root, int id) {
+    if (root == nullptr) {
+        return nullptr;
+    } else if (id < root->id) {
+        root->left = deleteNode(root->left, id);
+    } else if (id > root->id) {
+        root->right = deleteNode(root->right, id);
+    } else {
+        if (root->left == nullptr) {
+            Node *temp = root->right;
+            delete root;
+            return temp;
+        }
+        if (root->right == nullptr) {
+            Node *temp = root->left;
+            delete root;
+            return temp;
+        }
+        Node *temp = findMin(root->right);
+        root->id = temp->id;
+        root->right = deleteNode(root->right, temp->id);
     }
-    else if (bf > 1 && id < root->left->id)
-    {
-        return rightRotate(root);
-    }
-    else if (bf < -1 && id < root->right->id)
-    {
-        root->right = rightRotate(root->right);
-        return leftRotate(root);
-    }
-    else if (bf > 1 && id > root->left->id)
-    {
-        root->left = leftRotate(root->left);
-        return rightRotate(root);
-    }
-
-    return root;
+    return reBalance(root, id);
 }
 
 std::string rank(std::string r)
@@ -203,8 +234,9 @@ main()
     root = insertNode(root, 10, 33, "suichan", "5-1");
     root = insertNode(root, 1, 33, "newbie", "5-1");
     show(root);
-
-    // show(root);
+    std::cout << std::endl;
+    deleteNode(root, 8);
+    show(root);
 
     std::cout << "Done!";
 
