@@ -166,7 +166,7 @@ Node *deleteNode(Node *root, int id)
             Node *temp = getMin(root->right);
 
             root->id = temp->id;
-            root->level = temp->id;
+            root->level = temp->level;
             root->username = temp->username;
             root->rank = temp->rank;
 
@@ -283,18 +283,11 @@ main()
     Node *root = nullptr;
 
     root = insertNode(root, 3, 33, "Vretz", "5-1");
-    root = insertNode(root, 8, 33, "Bunnyhop", "5-1");
     root = insertNode(root, 5, 33, "Bunnyhop senpai", "5-1");
-    root = insertNode(root, 10, 33, "suichan", "8-1");
-    root = insertNode(root, 1, 33, "newbie", "5-1");
-    root = insertNode(root, 11, 33, "impii", "9-1");
-    root = insertNode(root, 200, 33, "newbie", "5-1");
+    root = insertNode(root, 8, 33, "Bunnyhop", "5-1");
     show(root);
 
     std::cout << std::endl;
-    root = deleteNode(root, 10);
-    root = deleteNode(root, 11);
-    show(root);
 
     std::cout << "Done!~";
 
