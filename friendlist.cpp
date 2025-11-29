@@ -1,5 +1,6 @@
 #include <iostream>
 #include <sstream>
+#include <fstream>
 
 struct Node
 {
@@ -277,18 +278,86 @@ void show(Node *root, int step = 0)
     show(root->right, step++);
 }
 
+void dataImport(Node *&root)
+{
+    std::fstream file("data.txt", std::ios::in);
+
+    if (!file)
+    {
+        std::cout << "Terjadi error!";
+        return;
+    }
+
+    std::string buffer;
+    while (getline(file, buffer))
+    {
+        std::cout << buffer << std::endl;
+        std::string username, rank, id, level;
+
+        std::istringstream ss(buffer);
+
+        std::getline(ss, id, ':');
+        std::getline(ss, level, ':');
+        std::getline(ss, username, ':');
+        std::getline(ss, rank, ':');
+        root = insertNode(root, std::stoi(id), std::stoi(level), username, rank);
+    }
+
+    file.close();
+}
+
+void dataPackager(Node *root, std::string &result)
+{
+
+    if (root == nullptr)
+    {
+        return;
+    }
+
+    dataPackager(root->left, result);
+
+    std::string buffer = "";
+    buffer += std::to_string(root->id);
+    buffer += ":";
+    buffer += std::to_string(root->level);
+    buffer += ":";
+    buffer += root->username;
+    buffer += ":";
+    buffer += root->rank;
+    buffer += "\n";
+
+    result += buffer;
+
+    dataPackager(root->right, result);
+}
+
+void dataExport(Node *&root)
+{
+    std::fstream file("data.txt", std::ios::out | std::ios::trunc);
+
+    if (!file)
+    {
+        std::cout << "Terjadi error!";
+        return;
+    }
+
+    std::string buffer = "";
+
+    dataPackager(root, buffer);
+    file << buffer;
+
+    file.close();
+}
+
 main()
 {
 
     Node *root = nullptr;
+    dataImport(root);
 
-    root = insertNode(root, 3, 33, "Vretz", "5-1");
-    root = insertNode(root, 5, 33, "Bunnyhop senpai", "5-1");
-    root = insertNode(root, 8, 33, "Bunnyhop", "5-1");
     show(root);
 
-    std::cout << std::endl;
-
+    dataExport(root);
     std::cout << "Done!~";
 
     return 0;
