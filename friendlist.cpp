@@ -105,8 +105,8 @@ Node *insertNode(Node *root, int id, int level, std::string username, std::strin
     root->height = 1 + max(height(root->left), height(root->right));
 
     int bf = height(root->left) - height(root->right);
-    std::cout << bf << std::endl;
-    std::cout << root->height << "-" << root->username << std::endl;
+    // std::cout << bf << std::endl;
+    // std::cout << root->height << "-" << root->username << std::endl;
 
     if (bf < -1 && id > root->right->id)
     {
@@ -261,21 +261,41 @@ void show(Node *root, int step = 0)
     {
         if (step == 0)
         {
-            std::cout << "You have no friend :(";
+            std::cout << "You have no friend :(\nStart adding!\n";
         }
         return;
     }
 
     show(root->left, ++step);
 
-    std::cout << height(root->left) - height(root->right) << " = ";
-    std::cout << root->height << "\t";
+    // std::cout << height(root->left) - height(root->right) << " = ";
+    // std::cout << root->height << "\t";
     std::cout << root->id << "\t";
     std::cout << root->level << "\t";
-    std::cout << root->username << "\t\t";
+    std::cout << root->username << "\t\t\t";
     std::cout << rank(root->rank) << "\n";
 
     show(root->right, step++);
+}
+
+Node *searchById(Node *root, int id)
+{
+    if (root == nullptr)
+    {
+        return nullptr;
+    }
+    else if (id < root->id)
+    {
+        return searchById(root->left, id);
+    }
+    else if (id > root->id)
+    {
+        return searchById(root->right, id);
+    }
+    else
+    {
+        return root;
+    }
 }
 
 void dataImport(Node *&root)
@@ -291,7 +311,7 @@ void dataImport(Node *&root)
     std::string buffer;
     while (getline(file, buffer))
     {
-        std::cout << buffer << std::endl;
+        // std::cout << buffer << std::endl;
         std::string username, rank, id, level;
 
         std::istringstream ss(buffer);
@@ -349,13 +369,62 @@ void dataExport(Node *&root)
     file.close();
 }
 
+void menu(Node *root, int step = 0)
+{
+
+    if (root != nullptr)
+    {
+        std::cout << "ID\tLevel\tName\t\t\tRank\n";
+    }
+
+    std::cout << step;
+    if (step < 0)
+    {
+        show(root, step);
+    }
+    else
+    {
+        show(root);
+    }
+
+    int opt;
+    std::cout << "\n1. Add Friend\n2. Search by ID\n3. Search by Name (WIP)\n4. Remove Friend\n5. Close\n\nI'm choosing : ";
+    std::cin >> opt;
+
+    if (opt == 1)
+    {
+    }
+    else if (opt == 2)
+    {
+        int lf;
+        std::cout << "Insert ID : ";
+        std::cin >> lf;
+
+        Node *res = searchById(root, lf);
+
+        if (res == nullptr)
+        {
+            std::cout << "Not found!";
+            show(res);
+        }
+        else
+        {
+            show(res);
+        }
+    }
+    else if (opt == 5)
+    {
+        return;
+    }
+}
+
 main()
 {
 
     Node *root = nullptr;
     dataImport(root);
 
-    show(root);
+    menu(root);
 
     dataExport(root);
     std::cout << "Done!~";
