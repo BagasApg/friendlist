@@ -152,7 +152,7 @@ Node *deleteNode(Node *root, int id, bool announce = false)
     {
         if (announce)
         {
-            std::cout << "Player with ID : " << id << " has been removed.\n";
+            std::cout << "\nPlayer with ID : " << id << " has been removed.\n\n";
         }
         if (root->left == nullptr)
         {
@@ -429,7 +429,7 @@ void menu(Node *&root, int id)
     bool result = false;
     while (true)
     {
-        if (root != nullptr)
+        if (root != nullptr && !result)
         {
             header();
         }
@@ -440,7 +440,7 @@ void menu(Node *&root, int id)
         }
 
         int opt;
-        std::cout << "1. View All\n2. Add Friend\n3. Search by ID\n4. Search by Name (WIP)\n5. Remove Friend\n6. Close\n\n : ";
+        std::cout << "\n1. View All\n2. Add Friend\n3. Search by ID\n4. Search by Name (WIP)\n5. Remove Friend\n6. Close\n\n : ";
         std::cin >> opt;
 
         if (opt == 1)
@@ -491,8 +491,13 @@ void menu(Node *&root, int id)
             system("cls");
             if (res == nullptr)
             {
-                std::cout << "Not found!";
+                std::cout << "\nNot found!\n";
             }
+            else
+            {
+                header();
+            }
+
             show(res, -1);
             result = true;
         }
@@ -507,13 +512,13 @@ void menu(Node *&root, int id)
             Node *res = searchByName(root, lf);
             if (res == nullptr)
             {
-                std::cout << "Not found!";
-                show(res, -1);
+                std::cout << "\nNot found!\n";
             }
             else
             {
-                show(res, -1);
+                header();
             }
+            show(res, -1);
             result = true;
         }
         else if (opt == 5)
@@ -527,8 +532,7 @@ void menu(Node *&root, int id)
             system("cls");
             if (!res)
             {
-                std::cout << "Friend with that ID doesn't exist!\n";
-                return;
+                std::cout << "\nFriend with that ID doesn't exist!\n\n";
             }
             root = deleteNode(root, lf, true);
         }
@@ -549,7 +553,7 @@ int main()
     menu(root, auto_inc);
 
     dataExport(root);
-    std::cout << "Done!~";
+    std::cout << "\nClosing...";
 
     return 0;
 }
