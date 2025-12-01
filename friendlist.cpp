@@ -103,7 +103,6 @@ Node *insertNode(Node *root, int id, int level, std::string username, std::strin
     }
     else
     {
-        std::cout << "Player is already your friend!\n";
         return root;
     }
 
@@ -143,11 +142,11 @@ Node *deleteNode(Node *root, int id, bool announce = false)
     }
     else if (id < root->id)
     {
-        root->left = deleteNode(root->left, id, false);
+        root->left = deleteNode(root->left, id, announce);
     }
     else if (id > root->id)
     {
-        root->right = deleteNode(root->right, id, false);
+        root->right = deleteNode(root->right, id, announce);
     }
     else
     {
@@ -368,7 +367,7 @@ void dataImport(Node *&root, int &n)
         std::getline(ss, username, ':');
         std::getline(ss, rank, ':');
         root = insertNode(root, std::stoi(id), std::stoi(level), username, rank);
-        n++;
+        n = 1 + std::stoi(id);
     }
 
     file.close();
@@ -417,92 +416,130 @@ void dataExport(Node *&root)
     file.close();
 }
 
-void menu(Node *root, int id)
+void header()
 {
+    std::cout << "===========================================================\n";
+    std::cout << "                          Friends                          \n";
+    std::cout << "===========================================================\n";
+    std::cout << "ID\tLevel\tName\t\t\tRank\n";
+}
 
-    if (root != nullptr)
+void menu(Node *&root, int id)
+{
+    bool result = false;
+    while (true)
     {
-        std::cout << "ID\tLevel\tName\t\t\tRank\n";
-    }
-
-    show(root);
-
-    int opt;
-    std::cout << "\n1. Add Friend\n2. Search by ID\n3. Search by Name (WIP)\n4. Remove Friend\n5. Close\n\n : ";
-    std::cin >> opt;
-
-    if (opt == 1)
-    {
-        int level;
-        std::string username, rank;
-
-        std::cout << "Insert the details...\n";
-
-        std::cout << "Level: ";
-        std::cin >> level;
-        std::cin.ignore();
-
-        std::cout << "Username: ";
-        std::getline(std::cin, username);
-
-        std::cout << "Rank: ";
-        std::getline(std::cin, rank);
-
-        std::cout << id;
-        root = insertNode(root, id, level, username, rank);
-    }
-    else if (opt == 2)
-    {
-        int lf;
-        std::cout << "Insert ID : ";
-        std::cin >> lf;
-
-        Node *res = searchById(root, lf);
-
-        if (res == nullptr)
+        if (root != nullptr)
         {
-            std::cout << "Not found!";
-            show(res, -1);
+            header();
         }
-        else
-        {
-            show(res, -1);
-        }
-    }
-    else if (opt == 3)
-    {
-        std::cin.ignore();
-        std::string lf;
-        std::cout << "Insert Name : ";
-        std::getline(std::cin, lf);
 
-        Node *res = searchByName(root, lf);
-        if (res == nullptr)
+        if (!result)
         {
-            std::cout << "Not found!";
-            show(res, -1);
+            show(root);
         }
-        else
-        {
-            show(res, -1);
-        }
-    }
-    else if (opt == 4)
-    {
-        int lf;
-        std::cout << "Insert ID : ";
-        std::cin >> lf;
 
-        root = deleteNode(root, lf, true);
-        return;
-    }
-    else if (opt == 5)
-    {
-        return;
+        int opt;
+        std::cout << "1. View All\n2. Add Friend\n3. Search by ID\n4. Search by Name (WIP)\n5. Remove Friend\n6. Close\n\n : ";
+        std::cin >> opt;
+
+        if (opt == 1)
+        {
+            result = false;
+            system("cls");
+        }
+        else if (opt == 2)
+        {
+            int level;
+            std::string username, rank;
+
+            std::cout << "Insert the details...\n";
+
+            std::cout << "Level: ";
+            std::cin >> level;
+            std::cin.ignore();
+
+            std::cout << "Username: ";
+            std::getline(std::cin, username);
+
+            std::cout << "Rank: ";
+            std::getline(std::cin, rank);
+
+            std::cout << id;
+
+            Node *res = searchById(root, id);
+
+            system("cls");
+            if (!res)
+            {
+                root = insertNode(root, id, level, username, rank);
+                std::cout << "Added " << username << " as your friend!\n";
+            }
+            else
+            {
+                std::cout << "Player is already your friend!\n";
+            }
+        }
+        else if (opt == 3)
+        {
+            int lf;
+            std::cout << "Insert ID : ";
+            std::cin >> lf;
+
+            Node *res = searchById(root, lf);
+
+            system("cls");
+            if (res == nullptr)
+            {
+                std::cout << "Not found!";
+            }
+            show(res, -1);
+            result = true;
+        }
+        else if (opt == 4)
+        {
+            std::cin.ignore();
+            std::string lf;
+            std::cout << "Insert Name : ";
+            std::getline(std::cin, lf);
+
+            system("cls");
+            Node *res = searchByName(root, lf);
+            if (res == nullptr)
+            {
+                std::cout << "Not found!";
+                show(res, -1);
+            }
+            else
+            {
+                show(res, -1);
+            }
+            result = true;
+        }
+        else if (opt == 5)
+        {
+            int lf;
+            std::cout << "Insert ID : ";
+            std::cin >> lf;
+
+            Node *res = searchById(root, lf);
+
+            system("cls");
+            if (!res)
+            {
+                std::cout << "Friend with that ID doesn't exist!\n";
+                return;
+            }
+            root = deleteNode(root, lf, true);
+        }
+        else if (opt == 6)
+        {
+            return;
+        }
     }
 }
 
-main()
+int main()
 {
 
     int auto_inc = 1;
