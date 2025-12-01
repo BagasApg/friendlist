@@ -440,7 +440,7 @@ void menu(Node *&root, int id)
         }
 
         int opt;
-        std::cout << "\n1. View All\n2. Add Friend\n3. Search by ID\n4. Search by Name (WIP)\n5. Remove Friend\n6. Close\n\n : ";
+        std::cout << "\n1. View All\n2. Add Friend\n3. Search by ID\n4. Search by Name (WIP)\n5. Remove Friend\n6. Close\n\nI'm choosing : ";
         std::cin >> opt;
 
         if (opt == 1)
@@ -465,15 +465,15 @@ void menu(Node *&root, int id)
             std::cout << "Rank: ";
             std::getline(std::cin, rank);
 
-            std::cout << id;
-
             Node *res = searchById(root, id);
 
             system("cls");
             if (!res)
             {
+
                 root = insertNode(root, id, level, username, rank);
                 std::cout << "Added " << username << " as your friend!\n";
+                id++;
             }
             else
             {
