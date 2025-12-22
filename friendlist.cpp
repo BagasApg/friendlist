@@ -12,6 +12,154 @@ struct Node
     Node *right;
 };
 
+struct NodeBST
+{
+    int id, level;
+    std::string username, rank;
+
+    NodeBST *left;
+    NodeBST *right;
+};
+
+std::string rank(std::string r)
+{
+    std::string res = "";
+    std::string buffer;
+
+    std::istringstream ss(r);
+
+    std::getline(ss, buffer, '-');
+    if (buffer == "0")
+    {
+        res += "Warrior";
+    }
+    else if (buffer == "1")
+    {
+        res += "Elite";
+    }
+    else if (buffer == "2")
+    {
+        res += "Master";
+    }
+    else if (buffer == "3")
+    {
+        res += "Grandmaster";
+    }
+    else if (buffer == "4")
+    {
+        res += "Epic";
+    }
+    else if (buffer == "5")
+    {
+        res += "Legend";
+    }
+    else if (buffer == "6")
+    {
+        res += "Mythic";
+    }
+    else if (buffer == "7")
+    {
+        res += "Mythical Honor";
+    }
+    else if (buffer == "8")
+    {
+        res += "Mythical Glory";
+    }
+    else
+    {
+        res += "Mythical Immortal";
+    }
+
+    std::getline(ss, buffer, '-');
+
+    return res + " " + buffer;
+}
+
+// BST
+NodeBST *createNewNodeBST(int id, int level, std::string name, std::string rank)
+{
+
+    NodeBST *newNode = new NodeBST();
+
+    newNode->id = id;
+    newNode->level = level;
+    newNode->username = name;
+    newNode->rank = rank;
+
+    newNode->left = newNode->right = nullptr;
+    return newNode;
+}
+
+NodeBST *insertBST(NodeBST *root, int id, int level, std::string username, std::string rank)
+{
+    if (root == nullptr)
+    {
+        root = createNewNodeBST(id, level, username, rank);
+    }
+    else if (id < root->id)
+    {
+        root->left = insertBST(root->left, id, level, username, rank);
+    }
+    else
+    {
+        root->right = insertBST(root->right, id, level, username, rank);
+    }
+
+    return root;
+}
+
+void AVLtoBST(Node *AVL, NodeBST *&BST)
+{
+    if (!AVL)
+    {
+        return;
+    }
+
+    AVLtoBST(AVL->left, BST);
+
+    BST = insertBST(BST, AVL->id, AVL->level, AVL->username, AVL->rank);
+
+    AVLtoBST(AVL->right, BST);
+}
+
+void inorderBST(NodeBST *root, int step = 0)
+{
+    if (!root)
+    {
+        if (step == 0)
+        {
+            std::cout << "You have no friend :(\nStart adding!\n";
+        }
+        return;
+    }
+
+    if (step > -1)
+    {
+        inorderBST(root->left, ++step);
+    }
+
+    std::cout << root->id << "\t"
+              << root->level << "\t"
+              << root->username << "\t\t\t"
+              << rank(root->rank) << "\n";
+
+    if (step > -1)
+    {
+        inorderBST(root->right, step++);
+    }
+}
+
+void freeBST(NodeBST *root)
+{
+    if (!root)
+        return;
+
+    freeBST(root->left);
+    freeBST(root->right);
+    delete root;
+}
+
+// AVL
 Node *createNewNode(int id, int level, std::string name, std::string rank)
 {
     Node *newNode = new Node();
@@ -211,60 +359,6 @@ Node *deleteNode(Node *root, int id, bool announce = false)
     return root;
 }
 
-std::string rank(std::string r)
-{
-    std::string res = "";
-    std::string buffer;
-
-    std::istringstream ss(r);
-
-    std::getline(ss, buffer, '-');
-    if (buffer == "0")
-    {
-        res += "Warrior";
-    }
-    else if (buffer == "1")
-    {
-        res += "Elite";
-    }
-    else if (buffer == "2")
-    {
-        res += "Master";
-    }
-    else if (buffer == "3")
-    {
-        res += "Grandmaster";
-    }
-    else if (buffer == "4")
-    {
-        res += "Epic";
-    }
-    else if (buffer == "5")
-    {
-        res += "Legend";
-    }
-    else if (buffer == "6")
-    {
-        res += "Mythic";
-    }
-    else if (buffer == "7")
-    {
-        res += "Mythical Honor";
-    }
-    else if (buffer == "8")
-    {
-        res += "Mythical Glory";
-    }
-    else
-    {
-        res += "Mythical Immortal";
-    }
-
-    std::getline(ss, buffer, '-');
-
-    return res + " " + buffer;
-}
-
 void show(Node *root, int step = 0)
 {
     if (root == nullptr)
@@ -416,15 +510,55 @@ void dataExport(Node *&root)
     file.close();
 }
 
-void header()
+void header(std::string fetch = "")
 {
     std::cout << "===========================================================\n";
-    std::cout << "                          Friends                          \n";
+    if (fetch.empty())
+    {
+        std::cout << "                          Friends                          \n";
+    }
+    else
+    {
+        std::cout << "                          " << fetch << "                          \n";
+    }
     std::cout << "===========================================================\n";
     std::cout << "ID\tLevel\tName\t\t\tRank\n";
 }
 
-void menu(Node *&root, int id)
+void printAVL(Node *root, int space = 0, int gap = 5)
+{
+    if (!root)
+        return;
+
+    space += gap;
+    printAVL(root->right, space);
+
+    std::cout << "\n";
+    for (int i = gap; i < space; i++)
+        std::cout << " ";
+    std::cout << root->id; // TANPA height
+
+    printAVL(root->left, space);
+}
+
+void printBST(NodeBST *root, int space = 0, int gap = 5)
+{
+    if (!root)
+        return;
+
+    space += gap;
+
+    printBST(root->left, space);
+
+    std::cout << "\n";
+    for (int i = gap; i < space; i++)
+        std::cout << " ";
+    std::cout << root->id;
+
+    printBST(root->right, space);
+}
+
+void menu(Node *&root, NodeBST *&bstroot, int id)
 {
     bool result = false;
     while (true)
@@ -440,7 +574,7 @@ void menu(Node *&root, int id)
         }
 
         int opt;
-        std::cout << "\n1. View All\n2. Add Friend\n3. Search by ID\n4. Search by Name (WIP)\n5. Remove Friend\n6. Close\n\nI'm choosing : ";
+        std::cout << "\n1. View All\n2. Add Friend\n3. Search by ID\n4. Search by Name (WIP)\n5. Remove Friend\n6. Display Tree\n7. View in BST\n8. Close\n\nI'm choosing : ";
         std::cin >> opt;
 
         if (opt == 1)
@@ -538,7 +672,49 @@ void menu(Node *&root, int id)
         }
         else if (opt == 6)
         {
+            int opt;
+            std::cout << "1. BST\n2. AVL\n\n : ";
+            std::cin >> opt;
+            if (opt == 1)
+            {
+                system("cls");
+                std::cout << "Displaying in Binary Search Tree\n";
+                printBST(bstroot);
+                std::cout << "\n";
+                freeBST(bstroot);
+                result = true;
+            }
+            else if (opt == 2)
+            {
+                system("cls");
+                std::cout << "Displaying in AVL Tree\n";
+                printAVL(root);
+                std::cout << "\n";
+                result = true;
+            }
+            else
+            {
+                system("cls");
+                std::cout << "Invalid!\n";
+                continue;
+            }
+        }
+        else if (opt == 7)
+        {
+            system("cls");
+            header("Friendlist (BST)");
+            inorderBST(bstroot);
+            std::cout << "\n";
+            result = true;
+        }
+        else if (opt == 8)
+        {
             return;
+        }
+        else
+        {
+            system("cls");
+            std::cout << "Pilihan tidak valid!\n";
         }
     }
 }
@@ -548,9 +724,13 @@ int main()
 
     int auto_inc = 1;
     Node *root = nullptr;
+    NodeBST *BSTroot = nullptr;
     dataImport(root, auto_inc);
 
-    menu(root, auto_inc);
+    AVLtoBST(root, BSTroot);
+    // inorderBST(BSTroot);
+
+    menu(root, BSTroot, auto_inc);
 
     dataExport(root);
     std::cout << "\nClosing...";
